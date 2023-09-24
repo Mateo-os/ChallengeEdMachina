@@ -57,13 +57,13 @@ async def get_lead(id:int,db:db_dependency):
 @app.post('/leads/',response_model=models.Lead)
 async def create_lead(lead:models.Lead,db:db_dependency):
     l_dict = lead.__dict__
-    attempts = l_dict.pop('attempts')
+    attempts:List[models.CourseAttempt] = l_dict.pop('attempts')
     db_lead = dbmodels.Lead(**l_dict)
     db.add(db_lead)
     db.commit()
     db.refresh(db_lead)
     for attempt in attempts:
-        course = attempt.course_name
+        course = attempt.course_name.upper()
         db_course = db.query(dbmodels.Course).filter(dbmodels.Course.name==course).first() 
         if db_course is None:
             db_course = dbmodels.Course(name=course)

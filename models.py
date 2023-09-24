@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
+#right now this models is useless/redundant but is good future-proofing
 class Course(BaseModel):
     id : Optional[int] = None
     name:str
@@ -21,6 +22,8 @@ class Lead(BaseModel):
     registration_year: int
     attempts: Optional[List[CourseAttempt]] = None 
 
+
+#Models for Leads, with reduced information
 class ShortLead(BaseModel):
     id:int
     name: str

@@ -87,7 +87,7 @@ async def delete_lead(id,db:db_dependency):
     db.commit()  
 
 @app.post('/courses/',response_model=models.Course)
-async def create_lead(course:models.Course,db:db_dependency):
+async def create_course(course:models.Course,db:db_dependency):
     course.name = course.name.upper()
     db_course = db.query(dbmodels.Course).filter(dbmodels.Course.name==course.name).first()
     if db_course is not None:
@@ -102,7 +102,7 @@ async def create_lead(course:models.Course,db:db_dependency):
     return course
 
 @app.get('/courses/',response_model = List[models.Course])
-async def get_leads(db:db_dependency, skip: int = Query(0, description="Skip items", ge=0), 
+async def get_courses(db:db_dependency, skip: int = Query(0, description="Skip items", ge=0), 
                     limit: int = Query(10, description="Limit items", le=50)):
     db_courses = db.query(dbmodels.Course).offset(skip).limit(limit).all()
     courses = [models.Course(id=db_course.id,name=db_course.name) 
@@ -112,7 +112,7 @@ async def get_leads(db:db_dependency, skip: int = Query(0, description="Skip ite
 
 
 @app.delete('/courses/{id}')
-async def delete_lead(id,db:db_dependency):
+async def delete_course(id,db:db_dependency):
     db_course:dbmodels.Course = db.query(dbmodels.Course).get(id)
     if db_course is None: raise HTTPException(404)
     db.delete(db_course)

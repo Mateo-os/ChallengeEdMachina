@@ -56,8 +56,9 @@ async def get_lead(id:int,db:db_dependency):
 
 @app.post('/leads/',response_model=models.Lead)
 async def create_lead(lead:models.Lead,db:db_dependency):
-    l_dict = lead.__dict__
-    attempts:List[models.CourseAttempt] = l_dict.pop('attempts')
+    l_dict = lead.__dict__.copy()
+    l_dict.pop('id',None)
+    attempts:List[models.CourseAttempt] = l_dict.pop('attempts',[])
     db_lead = dbmodels.Lead(**l_dict)
     db.add(db_lead)
     db.commit()
@@ -65,6 +66,7 @@ async def create_lead(lead:models.Lead,db:db_dependency):
     for attempt in attempts:
         course = attempt.course_name.upper()
         db_course = db.query(dbmodels.Course).filter(dbmodels.Course.name==course).first() 
+        # We create the course if it doesnt exist
         if db_course is None:
             db_course = dbmodels.Course(name=course)
             db.add(db_course)
@@ -82,4 +84,36 @@ async def delete_lead(id,db:db_dependency):
     db_lead:dbmodels.Lead = db.query(dbmodels.Lead).get(id)
     if db_lead is None: raise HTTPException(404)
     db.delete(db_lead)
+    db.commit()  
+
+@app.post('/courses/',response_model=models.Course)
+async def create_lead(course:models.Course,db:db_dependency):
+    course.name = course.name.upper()
+    db_course = db.query(dbmodels.Course).filter(dbmodels.Course.name==course.name).first()
+    if db_course is not None:
+        raise HTTPException(409,detail="Course with that name already exists")
+    course_dict = course.__dict__.copy()
+    course_dict.pop('id',None)
+    db_course = dbmodels.Course(**course_dict)
+    db.add(db_course)
+    db.commit()
+    db.refresh(db_course)
+    course.id = db_course.id
+    return course
+
+@app.get('/courses/',response_model = List[models.Course])
+async def get_leads(db:db_dependency, skip: int = Query(0, description="Skip items", ge=0), 
+                    limit: int = Query(10, description="Limit items", le=50)):
+    db_courses = db.query(dbmodels.Course).offset(skip).limit(limit).all()
+    courses = [models.Course(id=db_course.id,name=db_course.name) 
+             for db_course in db_courses]
+    return courses
+
+
+
+@app.delete('/courses/{id}')
+async def delete_lead(id,db:db_dependency):
+    db_course:dbmodels.Course = db.query(dbmodels.Course).get(id)
+    if db_course is None: raise HTTPException(404)
+    db.delete(db_course)
     db.commit()  

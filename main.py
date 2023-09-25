@@ -1,6 +1,7 @@
 
 from typing import List, Annotated
 from fastapi import FastAPI,Depends, Query, HTTPException
+from fastapi.responses import RedirectResponse
 import dbmodels
 import models
 
@@ -25,7 +26,7 @@ db_dependency = Annotated[Session,Depends(get_db)]
 
 @app.get('/')
 async def root():
-    return {'message': 'Too Lazy to make a front, post the lead at the /leads/ endpoint'}
+    return RedirectResponse('/docs/')
 
 
 @app.get('/leads/',response_model = List[models.ShortLead])

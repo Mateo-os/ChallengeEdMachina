@@ -15,10 +15,11 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of your application code into the container
-COPY . /app/
+COPY /app/ /app/
 
 # Expose port 80 for FastAPI
 EXPOSE 80
 
 # Command to run your FastAPI application
-CMD ["uvicorn", "app:asgi", "--host", "0.0.0.0", "--port", "80"]
+
+CMD ["uvicorn", "asgi:app", "--host", "0.0.0.0", "--port", "80"]

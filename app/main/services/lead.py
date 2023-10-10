@@ -1,20 +1,21 @@
 from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from models.lead import Lead as DBLead, CourseAttempt as DBAttempt
-from models.course import Course as DBCourse #Renamed as DBCourse for consistency's sake
-from schema.lead import Lead,LeadBase,ShortLead, CourseAttempt
+
+from main.models.course import Course as DBCourse #Renamed as DBCourse for consistency's sake
+from main.schema.lead import Lead,LeadBase,ShortLead, CourseAttempt
+from main.models.lead import Lead as DBLead, CourseAttempt as DBAttempt
 
 
 class LeadService:
     
-    def list_leads(db:Session,skip:int,limit:int) -> List[ShortLead]:
+    def list_leads(self,db:Session,skip:int,limit:int) -> List[ShortLead]:
         db_leads = db.query(DBLead).offset(skip).limit(limit).all()
         leads = [ShortLead(id=db_lead.id,name=db_lead.name,last_name=db_lead.last_name, carreer=db_lead.carreer) 
                 for db_lead in db_leads]
         return leads
         
-    def get_lead(db:Session,lead_id:int) -> Lead:
+    def get_lead(self,db:Session,lead_id:int) -> Lead:
         db_lead:DBLead = db.query(DBLead).get(id)
         if not db_lead:
             return None
@@ -29,7 +30,7 @@ class LeadService:
         lead.pop('attempts',None)
         return Lead(**lead,attempts=attempts)
 
-    def create_lead(db:Session, lead:LeadBase) -> Lead:
+    def create_lead(self,db:Session, lead:LeadBase) -> Lead:
         attempts = lead.attempts
         lead_dict = lead.__dict__
         lead_dict.pop('attempts',None)
@@ -56,6 +57,15 @@ class LeadService:
         lead_dict = db_lead.to_dict()
         lead_dict.attempts = attempts
         return Lead(**lead_dict)
+    
+    async def delete_lead(self,db:Session, id:int) -> bool:
+        db_lead:DBLead = db.query(DBLead).get(id)
+        if db_lead is None: 
+            return False
+        db.delete(db_lead)
+        db.commit()  
+        return True
+
 
 
 lead_service = LeadService()

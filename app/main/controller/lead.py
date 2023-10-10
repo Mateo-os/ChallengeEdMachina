@@ -1,28 +1,35 @@
 from typing import List
-from app.database import get_db
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, APIRouter, Depends, Query
+from fastapi import HTTPException, APIRouter, Depends, Query, status
 
-from services.lead import lead_service
-from schema.lead import Lead, LeadBase, ShortLead
+from database import get_db
+from main.services.lead import lead_service
+from main.schema.lead import Lead, LeadBase, ShortLead
 
 router = APIRouter()
 
-@router.get('/leads/',response_model = List[ShortLead])
+@router.get('/',response_model = List[ShortLead],status_code=status.HTTP_200_OK)
 async def get_leads(db:Session= Depends(get_db), skip: int = Query(0, description="Skip items", ge=0), 
                     limit: int = Query(10, description="Limit items", le=50)) -> List[ShortLead]:
+
     return lead_service.list_leads(db,skip,limit)
 
-@router.get('/leads/{id}',response_model=Lead)
+@router.get('/{id}',response_model=Lead,status_code=status.HTTP_200_OK)
 def get_lead(id:int, db:Session = Depends(get_db)):
     lead = lead_service.get_lead(db,id)
     if not lead:
         raise HTTPException(404,"Does not exist")
     return lead
 
-@router.post('/leads/',response_model=Lead)
+@router.post('/',response_model=Lead,status_code=status.HTTP_200_OK)
 def create_lead(base_lead:LeadBase, db:Session = Depends(get_db)):
     lead = lead_service.create_lead(db = db, lead=base_lead)
     if not lead:
-        raise HTTPException(400)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     return lead
+
+@router.delete('/{id}')
+async def delete_lead(id:int,db:Session = Depends(get_db),status_code=status.HTTP_200_OK):
+    if not lead_service.delete_lead(db=db,lead_id=id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    return

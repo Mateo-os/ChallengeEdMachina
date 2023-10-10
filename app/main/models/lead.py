@@ -1,8 +1,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from database import db
 from .base import BaseModel
 
-class Lead(BaseModel):
+class Lead(db.Model,BaseModel):
     __tablename__ = "leads"
     id = Column(Integer,primary_key=True, index=True)
     name = Column(String,default="")
@@ -14,7 +15,7 @@ class Lead(BaseModel):
     attempts = relationship('CourseAttempt', backref='lead', passive_deletes=True)
     
 # Save the relation as a separate table to make it easier to countabilize
-class CourseAttempt(BaseModel):
+class CourseAttempt(db.Model,BaseModel):
     __tablename__ = "attempts"
     lead_id = Column(Integer,ForeignKey("leads.id",ondelete="CASCADE"),primary_key=True)
     course_id = Column(Integer,ForeignKey("courses.id",ondelete="CASCADE"),primary_key=True)

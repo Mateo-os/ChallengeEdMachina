@@ -23,9 +23,7 @@ class LeadService(BaseService):
         
         attempts = []
         for attempt in db_lead.attempts:
-            #TODO Research join
-            course_name = db.query(DBCourse).get(attempt.course_id).name 
-            attempts.append(CourseAttempt(course_name=course_name,attempt_year=attempt.attempt_year))
+            attempts.append(CourseAttempt(attempt.course.name,attempt_year=attempt.attempt_year))
         
         lead = db_lead.to_dict()
         lead.pop('attempts',None)

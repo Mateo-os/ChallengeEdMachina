@@ -1,23 +1,38 @@
-version: '3'
+version: "3.7"
+
 services:
   postgres:
+    container_name: postgres
     image: postgres:latest 
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: challenge
+      POSTGRES_SERVER: postgres
     ports:
       - "5432:5432"  # Map container port to host port
+    networks:
+      - challenge
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persist data
   api:
-    build: .
-    command: bash -c "alembic upgrade head && uvicorn asgi:app --host 0.0.0.0 --port 80 --reload"
+    container_name: api
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    command: bash -c "uvicorn asgi:app --host 0.0.0.0 --port 80 --reload"
     ports:
       - "80:80"
+    networks:
+      - challenge
     depends_on:
       - postgres
     env_file:
       - ./.env
+
 volumes:
   postgres_data:
+
+networks:
+  challenge:
+    name: challenge

@@ -16,7 +16,7 @@ class SQLAlchemy():
         self.session = sessionmaker(autocommit=False,
                                     autoflush=False,
                                     bind=self.engine)
-
+        self.Model.metadata.create_all(bind=self.engine)
 
 db = SQLAlchemy()
 

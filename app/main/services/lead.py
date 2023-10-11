@@ -6,8 +6,9 @@ from main.models.course import Course as DBCourse #Renamed as DBCourse for consi
 from main.schema.lead import Lead,LeadBase,ShortLead, CourseAttempt
 from main.models.lead import Lead as DBLead, CourseAttempt as DBAttempt
 
+from .base import BaseService
 
-class LeadService:
+class LeadService(BaseService):
     
     def list_leads(self,db:Session,skip:int,limit:int) -> List[ShortLead]:
         db_leads = db.query(DBLead).offset(skip).limit(limit).all()
@@ -15,7 +16,7 @@ class LeadService:
                 for db_lead in db_leads]
         return leads
         
-    def get_lead(self,db:Session,lead_id:int) -> Lead:
+    def get_lead(self,db:Session,id:int) -> Lead:
         db_lead:DBLead = db.query(DBLead).get(id)
         if not db_lead:
             return None
@@ -24,8 +25,8 @@ class LeadService:
         for attempt in db_lead.attempts:
             #TODO Research join
             course_name = db.query(DBCourse).get(attempt.course_id).name 
-            attempts.append(CourseAttempt(course_name=course_name,attempt_year=attempt.year))
-
+            attempts.append(CourseAttempt(course_name=course_name,attempt_year=attempt.attempt_year))
+        
         lead = db_lead.to_dict()
         lead.pop('attempts',None)
         return Lead(**lead,attempts=attempts)
@@ -55,10 +56,10 @@ class LeadService:
         db.commit()
         db.refresh(db_lead)
         lead_dict = db_lead.to_dict()
-        lead_dict.attempts = attempts
+        lead_dict['attempts']= attempts
         return Lead(**lead_dict)
     
-    async def delete_lead(self,db:Session, id:int) -> bool:
+    def delete_lead(self,db:Session, id:int) -> bool:
         db_lead:DBLead = db.query(DBLead).get(id)
         if db_lead is None: 
             return False

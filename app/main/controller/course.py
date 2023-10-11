@@ -21,7 +21,7 @@ def create_course(course:CourseBase, db:Session=Depends(get_db)) -> Course:
     return course
 
 @router.delete('/{id}',status_code=status.HTTP_200_OK)
-async def delete_course(id:int,db:Session = Depends(get_db)):
+def delete_course(id:int,db:Session = Depends(get_db)):
     if not course_service.delete_course(db,id):
         raise HTTPException(400,"Delete unsucessfull")
     return

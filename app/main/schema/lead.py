@@ -15,7 +15,7 @@ class LeadBase(BaseModel):
     registration_year: int
     attempts: Optional[List[CourseAttempt]] = None 
 
-class Lead(BaseModel):
+class Lead(LeadBase):
     id: Optional[int] = None
         
     class Config: 

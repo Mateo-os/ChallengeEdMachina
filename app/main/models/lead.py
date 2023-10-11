@@ -13,7 +13,7 @@ class Lead(db.Model,BaseModel):
     carreer = Column(String,index=True,default="")
     registration_year = Column(Integer,default=0)
     attempts = relationship('CourseAttempt', backref='lead', passive_deletes=True)
-    
+
 # Save the relation as a separate table to make it easier to countabilize
 class CourseAttempt(db.Model,BaseModel):
     __tablename__ = "attempts"

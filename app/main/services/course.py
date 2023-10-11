@@ -4,8 +4,9 @@ from sqlalchemy.exc import IntegrityError
 
 from main.models.course import Course as DBCourse
 from main.schema.course import Course,CourseBase
+from .base import BaseService
 
-class CourseService:
+class CourseService(BaseService):
     
     def list_courses(self,db:Session,skip:int,limit:int) -> List[Course]:
         db_courses = db.query(DBCourse).offset(skip).limit(limit).all()

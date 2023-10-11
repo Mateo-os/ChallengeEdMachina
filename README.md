@@ -52,4 +52,5 @@ Deletes the course with matching _id_. If it doesn't exists, a 404 will be retur
 
 The whole project is containerized, so to run it the only thing to do is be on the main project folder and run:
  
-``` docker-compose up build ```
+``` docker-compose up --build ```
+This will build and run the containers as well as run the db migrations 

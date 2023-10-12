@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from settings import settings
 
 
-class SQLAlchemy():
+class SQLAlchemy:
     def __init__(self):
         self.Model = declarative_base()
         self.settings = settings
@@ -13,10 +13,9 @@ class SQLAlchemy():
         SQLALCHEMY_DATABASE_URI = self.settings.DATABASE_URL
 
         self.engine = create_engine(SQLALCHEMY_DATABASE_URI)
-        self.session = sessionmaker(autocommit=False,
-                                    autoflush=False,
-                                    bind=self.engine)
-        #self.Model.metadata.create_all(bind=self.engine)
+        self.session = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        # self.Model.metadata.create_all(bind=self.engine)
+
 
 db = SQLAlchemy()
 

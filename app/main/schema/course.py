@@ -1,9 +1,11 @@
 from typing import List, Optional
 from pydantic import BaseModel
 
-#right now this models is useless/redundant but is good future-proofing
+
+# right now this models is useless/redundant but is good future-proofing
 class CourseBase(BaseModel):
-    name:str
+    name: str
+
 
 class Course(CourseBase):
     id: int
